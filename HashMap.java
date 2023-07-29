@@ -1,3 +1,6 @@
+//Для добавления возможности перебора всех элементов структуры данных HashMap, мы реализуем метод iterator()
+//в классе HashMap и вложенный класс HashMapIterator, который будет выполнять перебор всех элементов.
+
 package ru.geekbrains.lesson4;
 
 import java.util.Iterator;
@@ -18,16 +21,43 @@ public class HashMap<K, V> implements Iterable<HashMap.Entity> {
 
     class HashMapIterator implements Iterator<HashMap.Entity>{
 
+        private int currentBucketIndex;
+        private Bucket<K, V>.Node currentNode;
+
+        public HashMapIterator() {
+            currentBucketIndex = 0;
+            currentNode = null;
+            findNextNode();
+        }
+        
         @Override
         public boolean hasNext() {
-            //TODO: Подумать головой, ведь это домашнее задание
-            return false;
+            return currentNode != null;
         }
 
         @Override
         public Entity next() {
-            //TODO: Подумать головой, ведь это домашнее задание
-            return null;
+            if (hasNext()) {
+                Entity entity = currentNode.value;
+                currentNode = currentNode.next;
+                if (currentNode == null) {
+                    currentBucketIndex++;
+                    findNextNode();
+                }
+                return entity;
+            } else {
+                throw new NoSuchElementException("No more elements to iterate.");
+            }
+        }
+
+        private void findNextNode() {
+            while (currentBucketIndex < buckets.length) {
+                if (buckets[currentBucketIndex] != null) {
+                    currentNode = buckets[currentBucketIndex].head;
+                    break;
+                }
+                currentBucketIndex++;
+            }
         }
     }
 
